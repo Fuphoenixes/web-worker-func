@@ -32,7 +32,7 @@ webWorkerSortFunc(numbers)
 ```
 支持 umd(dist/index.umd.js)、 esm(dist/index.esm.js) 、 cjs(dist/index.js) 各种模式引入
 
-eg: 可直接在html中引入 `<script src="../dist/index.umd.js" type="text/javascript"></script>` 然后使用`window.webWorkerFuncBuilder
+eg: 可直接在html中引入 `<script src="https://unpkg.com/web-worker-func@1.0.0/dist/index.umd.js" type="text/javascript"></script>` 然后使用`window.webWorkerFuncBuilder
 
 
 ## API
