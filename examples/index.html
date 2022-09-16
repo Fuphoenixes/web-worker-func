@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="../dist/index.umd.js" type="text/javascript"></script>
+</head>
+<body>
+<script>
+
+  const numbers = [...Array(5000000)].map(e => ~~(Math.random() * 1000000));
+  const sortFunc = nums => nums.sort();
+
+  const webWorkerSortFunc = webWorkerFuncBuilder(sortFunc)
+
+  webWorkerSortFunc(numbers)
+    .then((res) => {
+      console.log(res)
+    })
+
+</script>
+</body>
+</html>
