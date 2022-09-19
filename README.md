@@ -42,14 +42,16 @@ type Func = (...args: any) => any;
 type WebWorkerBuilder = <T extends Func>(fn: T, options?: Options) => (...args: Parameters<T>) => Promise<ReturnType<T>>;
 
 type Options = {
-  timeout?: number; 
-  importScripts?: string[]; 
-  transferable?: boolean;
+  timeout?: number,
+  importScripts?: string[],
+  depsFunc?: Func[],
+  transferable?: boolean
 };
 ```
 - options
     - timeout 过期时间设置
     - importScripts  worker文件引入的依赖
+    - depsFunc  fn函数运算时依赖的函数
     - transferable (可转让对象)是否使用高性能的通过转让所有权的方式来传递数据, 具体可[参考MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Workers_API/Using_web_workers#%E9%80%9A%E8%BF%87%E8%BD%AC%E8%AE%A9%E6%89%80%E6%9C%89%E6%9D%83_%E5%8F%AF%E8%BD%AC%E8%AE%A9%E5%AF%B9%E8%B1%A1_%E6%9D%A5%E4%BC%A0%E9%80%92%E6%95%B0%E6%8D%AE)
 
 ## thanks
