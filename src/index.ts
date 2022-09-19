@@ -3,11 +3,12 @@ type Func = (...args: any) => any
 
 type WebWorkerBuilder = <T extends Func>(fn: T, options?: Options) => (...args: Parameters<T>) => Promise<ReturnType<T>>
 
-type CreateWorkerBlobUrl = (fn: Func, importScripts: string[], transferable: boolean) => string
+type CreateWorkerBlobUrl = (fn: Func, importScripts: string[], depsFunc: Func[], transferable: boolean) => string
 
 type Options = {
   timeout?: number, // 过期时间
-  importScripts?: string[], // worker依赖
+  importScripts?: string[], // worker依赖的js文件
+  depsFunc?: Func[], // fn函数运算时依赖的函数
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers#passing_data_by_transferring_ownership_transferable_objects
   transferable?: boolean // (可转让对象)是否使用高性能的通过转让所有权的方式来传递数据
 }
@@ -15,6 +16,7 @@ type Options = {
 const defaultOptions = {
   timeout: 0,
   importScripts: [],
+  depsFunc: [],
   transferable: true
 }
 
@@ -46,11 +48,21 @@ const importScriptsParser = (importScripts: string[]) => {
   return `importScripts(${scriptsString});`
 }
 
-const createWorkerBlobUrl: CreateWorkerBlobUrl = (fn, importScripts, transferable) => {
+const depsFuncParser = (depsFunc: Func[]) => {
+  if (depsFunc.length === 0) return ''
+  const funcString = (depsFunc.map(func => {
+    return `var ${func.name} = ${func}`
+  })).join(';')
+  return funcString
+}
+
+const createWorkerBlobUrl: CreateWorkerBlobUrl = (fn, importScripts,  depsFunc, transferable) => {
   const blobCode = `
     ${importScriptsParser(importScripts)}
+    ${depsFuncParser(depsFunc)}
     onmessage=(${jobRunner})({ fn: (${fn}), transferable: ${transferable} })
   `
+  // console.log(blobCode)
   const blob = new Blob([blobCode], { type: 'text/javascript' })
   return URL.createObjectURL(blob)
 }
@@ -63,7 +75,7 @@ const webWorkerBuilder: WebWorkerBuilder = (fn, _options) => {
     return new Promise(((resolve, reject) => {
 
       let timeoutId: number
-      const blobUrl = createWorkerBlobUrl(fn, options.importScripts, options.transferable)
+      const blobUrl = createWorkerBlobUrl(fn, options.importScripts, options.depsFunc, options.transferable)
       const worker = new Worker(blobUrl)
 
       const killWorker = (): void => {

@@ -3,6 +3,7 @@ declare type WebWorkerBuilder = <T extends Func>(fn: T, options?: Options) => (.
 declare type Options = {
     timeout?: number;
     importScripts?: string[];
+    depsFunc?: Func[];
     transferable?: boolean;
 };
 declare const webWorkerBuilder: WebWorkerBuilder;
